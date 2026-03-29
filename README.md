@@ -1,10 +1,10 @@
-# Process Diagram Pro
-
 [English](./README.md) | [简体中文](https://github.com/xx235300/process-diagram-pro/blob/main/README_ZH.md)
+
+# Process Diagram Pro
 
 **Professional PFD/P&ID Diagram Generator for Chemical Engineering**
 
-[![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)]()
 [![Python](https://img.shields.io/badge/python-3.8+-green.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-orange.svg)]()
 
@@ -14,7 +14,6 @@
 
 **Disclaimer**:
 This project is 99% AI-generated. The AI's owner has no programming background. Please evaluate the project's feasibility before use.
-
 
 ## Overview
 
@@ -27,11 +26,13 @@ Process Diagram Pro is a Python-based professional diagram generation tool for c
 
 ## Features
 
-- 🌡️ **Temperature-based color mapping** (Blue → Green → Orange → Red)
+- 🌡️ **Temperature-based color mapping** (Blue → Cyan → Orange → Red)
 - 🔤 **Chinese font support** (Automatic fallback)
 - 🎨 **Industry-standard color scheme**
 - ⚙️ **Professional equipment symbols** (Tank, Reactor, Valve, Instrument)
-- 🔗 **Control loop connections** (Signal lines)
+- 🔗 **Control loop connections** (Signal lines - gray dashed)
+- 🏗️ **Grid backgrounds** (Customizable styles)
+- 🔌 **More valve types** (Hand valve, Check valve)
 
 ## Installation
 
@@ -80,8 +81,9 @@ gen = PIDGenerator()
 gen.set_title("P&ID with Control Loops & ESD")
 gen.add_equipment({'type': 'reactor', 'x': 6, 'y': 3, 'tag': 'R-01', 'name': 'Reactor', 'temp': 140})
 gen.add_valve({'type': 'esd', 'x': 3, 'y': 3, 'tag': 'XV-101'})
+gen.add_valve({'type': 'control', 'x': 4.5, 'y': 3, 'tag': 'TV-101'})
 gen.add_instrument({'type': 'TIC', 'x': 6, 'y': 5, 'tag': 'TIC-101'})
-gen.add_signal({'from': 'TE-101', 'to': 'TIC-101'})
+gen.add_signal({'from': 'TE-101', 'to': 'TIC-101'})  # Gray dashed line
 gen.save('pid_output.png')
 ```
 
@@ -90,7 +92,7 @@ gen.save('pid_output.png')
 ```python
 from chem_diagram_v3 import ArchitectureGenerator
 
-gen = ArchitectureGenerator()
+gen = ArchitectureGenerator(show_grid=True, grid_style='light')
 gen.set_title("Digital Twin System Architecture")
 gen.add_layer("Device Layer", ["Temperature Sensor", "PLC", "Edge Gateway"])
 gen.add_layer("Edge Computing", ["ESP32", "Edge Agent"])
@@ -106,7 +108,7 @@ gen.save('arch_output.png')
 | Type | Class | Description |
 |------|-------|-------------|
 | `'tank'` | Tank | Storage tank |
-| `'reactor'` | Reactor | Fixed bed reactor |
+| `'reactor'` | Reactor | Fixed bed reactor (temperature-based color) |
 | `'heat_exchanger'` | HeatExchanger | Heat exchanger / Preheater |
 | `'separator'` | Separator | Gas-liquid separator |
 
@@ -115,8 +117,10 @@ gen.save('arch_output.png')
 | Type | Class | Description |
 |------|-------|-------------|
 | `'control'` | ControlValve | Control valve (kite shape) |
-| `'esd'` | ESDValve | Emergency shutdown valve (pentagon) |
-| `'safety'` | SafetyValve | Safety valve (circle) |
+| `'esd'` | ESDValve | Emergency shutdown valve (pentagon, red) |
+| `'safety'` | SafetyValve | Safety valve (semicircle + triangle) |
+| `'hand'` | HandValve | Manual valve (diamond) ⭐ NEW |
+| `'check'` | CheckValve | Check valve (triangle) ⭐ NEW |
 
 ### Instrument Types
 
@@ -128,24 +132,25 @@ gen.save('arch_output.png')
 | `'TE'` | TE | Temperature Element |
 | `'PE'` | PE | Pressure Element |
 | `'FE'` | FE | Flow Element |
+| `'PSH'` | PSH | Pressure Switch (High) |
+| `'PSL'` | PSL | Pressure Switch (Low) |
+| `'AE'` | AE | Online Analyzer (hexagon) |
 
-## Color Scheme
+## Signal Lines (Enhanced)
 
-| Equipment | Color Code | Application |
-|-----------|------------|------------|
-| 🟦 Tank | `#E8F4FD` | Light blue |
-| 🟧 Heat Exchanger | `#FFF3E0` | Light orange |
-| 🟥 Reactor | `#FDE8E8` | Light red |
-| 🟩 Separator | `#E8F5E9` | Light green |
-| 🟪 Pump | `#F3E5F5` | Light purple |
+Signal lines now use **gray dashed style** (industry standard):
 
-### Temperature Gradient
-
+```python
+gen.add_signal({'from': 'TE-101', 'to': 'TIC-101'})
+# Renders as: gray dashed line with direction markers
 ```
-0°C   → #0033FF (Deep blue)
-40°C  → #00FFCC (Cyan)
-80°C  → #FF6600 (Orange)
-120°C → #FF0000 (Red)
+
+## Grid Backgrounds (NEW)
+
+Architecture diagrams support configurable grid backgrounds:
+
+```python
+gen = ArchitectureGenerator(show_grid=True, grid_style='light')  # light, dark, colorful
 ```
 
 ## Directory Structure
@@ -155,20 +160,20 @@ chem_diagram_v3/
 ├── __init__.py
 ├── core/
 │   ├── canvas.py        # Drawing canvas
-│   └── colors.py        # Color system
+│   └── colors.py        # Color system + temperature gradient
 ├── devices/
 │   ├── base.py          # Device base class
 │   ├── tanks.py         # Tank
-│   ├── reactors.py       # Reactor
+│   ├── reactors.py      # Reactor (temperature color)
 │   ├── heat_exchangers.py # Heat exchanger
-│   ├── valves.py         # Valves
-│   └── instruments.py    # Instruments
+│   ├── valves.py         # Valves (5 types)
+│   └── instruments.py    # Instruments (9 types)
 ├── pipelines/
-│   └── pipe.py          # Pipe / Signal line
+│   └── pipe.py          # Pipe, SignalLine (gray dashed), PipeElbow
 ├── diagrams/
 │   ├── pfd.py          # PFD generator
-│   ├── pid.py          # P&ID generator
-│   └── architecture.py # Architecture generator
+│   ├── pid.py           # P&ID generator
+│   └── architecture.py  # Architecture generator (grid support)
 └── fonts/
     └── loader.py       # Font loader
 ```
@@ -184,11 +189,42 @@ See the `examples/` directory for complete examples:
 
 **Q: Chinese characters show as boxes?**
 
-A: The tool automatically searches for available Chinese fonts on your system. If issues persist, install Source Han Sans or Alibaba PuHuiTi font.
+A: The tool automatically searches for available Chinese fonts. If issues persist, install Source Han Sans or Alibaba PuHuiTi font.
 
 **Q: Can I generate engineering-level P&ID?**
 
 A: This tool generates professional-looking PFD/P&ID for proposals and presentations. It cannot replace AutoCAD/SmartPlant for engineering drawings.
+
+---
+
+## Changelog
+
+### v2.0.0 (2026-03-29)
+
+**New Features:**
+- ✨ **New valve types**: HandValve (diamond), CheckValve (triangle)
+- ✨ **Enhanced instrument markers**: TIC/PIC/FIC use bold letters; PSH/PSL use triangle markers
+- ✨ **Signal line color change**: Gray dashed lines (industry standard)
+- ✨ **Background grids**: Architecture diagrams support configurable grid styles
+
+**Improvements:**
+- Valve symbols with enhanced borders and marker points
+- Pipe arrow style optimization
+- Instrument double-ring design
+- Signal lines with direction markers
+
+**Bug Fixes:**
+- Fixed `grid()` matplotlib 3.10+ compatibility (`b=True` → `visible=True`)
+
+**API Changes:**
+```python
+# Signal line color (old → new)
+# Old: Purple #9C27B0
+# New: Gray #757575
+
+# Architecture diagram new parameters
+gen = ArchitectureGenerator(show_grid=True, grid_style='light')
+```
 
 ---
 

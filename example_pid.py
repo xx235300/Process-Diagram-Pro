@@ -50,7 +50,7 @@ gen.add_instrument({'type': 'PIC', 'x': 8, 'y': 5, 'tag': 'PIC-101'})
 gen.add_instrument({'type': 'TE', 'x': 5.5, 'y': 2, 'tag': 'TE-101'})
 gen.add_instrument({'type': 'PE', 'x': 7.5, 'y': 2, 'tag': 'PE-101'})
 
-# Add signal lines
+# Add signal lines (gray dashed lines)
 gen.add_signal({'from': 'TE-101', 'to': 'TIC-101'})
 gen.add_signal({'from': 'PE-101', 'to': 'PIC-101'})
 
